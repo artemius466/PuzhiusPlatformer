@@ -312,7 +312,7 @@ void loadWorld(String filePath) {
           boxes[bbc].setPosition(x*gridSize, y*gridSize);
           boxes[bbc].setStatic(false);
           boxes[bbc].setFillColor(green);
-          boxes[bbc].setName("Grab " + str(bbc));
+          boxes[bbc].setName("Grab");
           world.add(boxes[bbc]);
           if (bbc != 9) {
             bbc++;
@@ -450,7 +450,7 @@ void draw() {
     }
 
     if (!sp) {
-      player2.setVelocity(player2.getVelocityX(), 0);
+      player2.setVelocity(0, 0);
       if (cs == 2) {
 
         // Data To Send Generation
@@ -504,20 +504,17 @@ void draw() {
             String inputSplit[] = input.split("\n");  // Only up to the newline
 
             data = float(split(inputSplit[0], ' '));  // Split values into an array
+            
 
             player2.setPosition(data[0], data[1]);
 
 
 
-            int bcount = 4;
+            int bcount = 2;
             for (FBox b : boxes) {
               if (b != null) {
-                try {
-                  b.setPosition(data[bcount], data[bcount+1]);
-                  bcount+= 2;
-                }
-                catch (Exception e) {
-                }
+                b.setPosition(data[bcount], data[bcount+1]);
+                bcount+= 2;
               }
             }
             for (Enemy e : enemies) {
