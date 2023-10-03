@@ -1,6 +1,6 @@
 ![Logo](images/1.png)
 # Puzhius Platformer
-Puzhius Platformer is a open-source pixel game created by Puzhius.
+Puzhius Platformer is a open-source pixel game with multiplayer created by Puzhius.
 ## How to install
 - To install this extension, go to [Releases](https://github.com/artemius466/PuzhiusPlatformer/releases) 
 - Download latest version
@@ -10,7 +10,7 @@ Puzhius Platformer is a open-source pixel game created by Puzhius.
 ## Tiled support
 Puzhius platformer is also supports [tiled](https://www.mapeditor.org/) maps.
 
-To create them, you need to download tiled package.
+To create them, you need to download [tiled package](https://github.com/artemius466/PuzhiusPlatformer/releases/tag/Other).
 
 ## Screenshots
 ![Logo](images/2.jpg)
