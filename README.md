@@ -7,10 +7,16 @@ Puzhius Platformer is a open-source pixel game created by Puzhius.
 - Unzip this file
 - Start the file named "PuzhiusPlatformer.exe"
 
+## Tiled support
+Puzhius platformer is also supports [tiled](https://www.mapeditor.org/) maps.
+
+To create them, you need to download tiled package.
+
 ## Screenshots
-
-TODO
-
+![Logo](images/2.jpg)
+![Logo](images/3.jpg)
+![Logo](images/4.jpg)
+![Logo](images/5.jpg)
 
 ## Authors
 
