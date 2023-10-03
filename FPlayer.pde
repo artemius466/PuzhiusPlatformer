@@ -12,9 +12,6 @@ class FPlayer extends FBox {
 
   private int ovy = -700;
 
-  private boolean inventoryFull = false;
-  FDistanceJoint boxInventory;
-
 
   void act() {
     if (checkContact("JumpPlatform")) {
@@ -22,10 +19,6 @@ class FPlayer extends FBox {
       if (ovy != 0) ovy = ovy + 100;
     } else if (checkContact("enemy")) {
       setPosition(startx, starty);
-      if (inventoryFull) {
-        inventoryFull = false;
-        world.remove(boxInventory);
-      }
     }
     setRotation(0);
     handleInput();
@@ -73,23 +66,12 @@ class FPlayer extends FBox {
         String name = bodyA.getName();
 
         String name1 = bodyB.getName();
+        
 
         if (name == "coin" || name1 == "coin") {
           world.remove(bodyA);
           coinSound.play();
           score++;
-        }
-        println(name);
-        if (name == "Grab" && (ekey) && !inventoryFull) {
-          inventoryFull = true;
-          boxInventory = new FDistanceJoint(this, bodyA);
-          boxInventory.setFrequency(1.5);
-          boxInventory.setLength(2);
-          boxInventory.setDrawable(true);
-          boxInventory.setStrokeColor(orange);
-          boxInventory.setStrokeWeight(5.5);
-          world.add(boxInventory);
-          ekey = false;
         }
         try {
           if (name.equals("brick")) {
@@ -143,11 +125,6 @@ class FPlayer extends FBox {
     if ((wkey) && (checkContact("JumpPlatform")) || upkey && (checkContact("JumpPlatform"))) {
       setVelocity(vx, -2000);
       ovy = -700;
-    }
-    if ((ekey) && inventoryFull) {
-      inventoryFull = false;
-      world.remove(boxInventory);
-      ekey = false;
     }
   }
 

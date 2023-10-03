@@ -1,5 +1,3 @@
-
-
 class Enemy extends FBox {
   Enemy() {
     super(gridSize, gridSize);

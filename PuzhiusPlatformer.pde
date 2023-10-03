@@ -33,7 +33,6 @@ color sky = #17acd1;
 
 PImage dirt, ice, stone, tree, flower, bad, treeTrunk, energy, jump, sklon1, sklon2, coin, spike, trans, conc1, conc2, conc3, brick;
 int gridSize = 32;
-Enemy e;
 float zoom = 1.5;
 boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, dkey, qkey, ekey, spacekey;
 boolean fileLoaded = false;
@@ -43,12 +42,14 @@ String filePath = "";
 String settingsPath = System.getenv("APPDATA") + "/Puzhius/settings.txt";
 FPlayer player;
 FBox player2;
+Enemy[] enemies = new Enemy[10];
 FBox[] coins = new FBox[500];
 FBox[] bricks = new FBox[500];
 PParticleEmitter[] brickParticleSystem = new PParticleEmitter[500];
 int cc = 0;
 FBox[] boxes = new FBox[10];
 PButton[] buttons = new PButton[10];
+boolean otherGrab = false;
 
 Menu menu;
 
@@ -171,7 +172,7 @@ void loadWorld(String filePath) {
   cc = 0;
   int bc = 0;
   int bbc = 0;
-
+  int ec = 0;
 
   for (y = 0; y < file.length; y++) {
     idS = split(file[y], ",");
@@ -208,10 +209,11 @@ void loadWorld(String filePath) {
           world.add(b);
         }
         if (block.equals(enemyTile)) {
-          e = new Enemy();
-          e.setPosition(x*gridSize, y*gridSize);
-          if (cs == 1) e.setStatic(true);
-          world.add(e);
+          enemies[ec] = new Enemy();
+          enemies[ec].setPosition(x*gridSize, y*gridSize);
+          if (cs == 1) enemies[ec].setStatic(true);
+          world.add(enemies[ec]);
+          ec++;
         }
         if (block.equals(energyTile)) {
           b.attachImage(energy);
@@ -310,7 +312,7 @@ void loadWorld(String filePath) {
           boxes[bbc].setPosition(x*gridSize, y*gridSize);
           boxes[bbc].setStatic(false);
           boxes[bbc].setFillColor(green);
-          boxes[bbc].setName("Grab");
+          boxes[bbc].setName("Grab " + str(bbc));
           world.add(boxes[bbc]);
           if (bbc != 9) {
             bbc++;
@@ -417,19 +419,21 @@ void draw() {
       background(black);
       text("Waiting...", width/2, height/2);
     } else {
-      try {
-        if (cs == 2) {
-          e.act(player, player2);
-        }
-      }
-      catch(Exception e) {
-      }
 
       for (PButton butt : buttons) {
         if (butt != null) {
           butt.act();
         }
       }
+
+      for (Enemy e : enemies) {
+        if (e != null) {
+          if (cs == 2) {
+            e.act(player, player2);
+          }
+        }
+      }
+
 
 
       background(pink);
@@ -453,32 +457,36 @@ void draw() {
         String dataToSend = "";
 
         dataToSend+=(player.getX() + " " + player.getY()); // Player
-
-        if (e != null) {
-          dataToSend+=(" " + e.getX() + " " + e.getY());
-        }
+        
 
         for (FBox b : boxes) {
-          println(b);
           if (b != null) {
             dataToSend+=(" " + b.getX() + " " + b.getY());
+          }
+        }
+
+        for (Enemy e : enemies) {
+          if (e != null) {
+            dataToSend+=(" " + e.getX() + " " + e.getY());
           }
         }
 
         dataToSend+="\n";
 
         s.write(dataToSend);
-        
+
         // Client
         c = s.available();
         if (c != null) {
           input = c.readString();
-          input = input.substring(0, input.indexOf("\n"));  // Only up to the newline
+          println(input);
+          String inputSplit[] = input.split("\n");
+
 
           if (waiting) {
             waiting = false;
           } else {
-            data = float(split(input, ' '));  // Split values into an array
+            data = float(split(inputSplit[0], ' '));  // Split values into an array
             try {
               player2.setPosition(data[0], data[1]);
             }
@@ -486,15 +494,39 @@ void draw() {
             }
           }
         }
-      } else {
-        //c.write(player.getX() + " " + player.getY() + "\n");
+      } else { // For client
+        c.write(player.getX() + " " + player.getY() + "\n"); // Send Position To Another Player
 
         if (c.available() > 0) {
           input = c.readString();
-          input = input.substring(0, input.indexOf("\n"));  // Only up to the newline
-          data = float(split(input, ' '));  // Split values into an array
+          if (input == "grab\n") {
+          } else {
+            String inputSplit[] = input.split("\n");  // Only up to the newline
 
-          println(data);
+            data = float(split(inputSplit[0], ' '));  // Split values into an array
+
+            player2.setPosition(data[0], data[1]);
+
+
+
+            int bcount = 4;
+            for (FBox b : boxes) {
+              if (b != null) {
+                try {
+                  b.setPosition(data[bcount], data[bcount+1]);
+                  bcount+= 2;
+                }
+                catch (Exception e) {
+                }
+              }
+            }
+            for (Enemy e : enemies) {
+              if (e != null) {
+                e.setPosition(data[bcount], data[bcount+1]);
+                bcount+=2;
+              }
+            }
+          }
         }
       }
     }
