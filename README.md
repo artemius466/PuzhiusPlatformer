@@ -2,7 +2,7 @@
 # Puzhius Platformer
 Puzhius Platformer is a open-source pixel game with multiplayer created by Puzhius.
 ## How to install
-- To install this extension, go to [Releases](https://github.com/artemius466/PuzhiusPlatformer/releases) 
+- To install this, go to [Releases](https://github.com/artemius466/PuzhiusPlatformer/releases) 
 - Download latest version
 - Unzip this file
 - Start the file named "PuzhiusPlatformer.exe"
