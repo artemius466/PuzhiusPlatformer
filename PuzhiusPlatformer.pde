@@ -590,7 +590,7 @@ void saveConfig() {
 }
 
 void playMusic() {
-  music = new SoundFile(this, "data/music.wav");
+  music = new SoundFile(this, "data/music.mp3");
   while (true) {
     delay(10000);
     if (!music.isPlaying() && waiting == false) {

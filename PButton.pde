@@ -18,7 +18,7 @@ class PButton extends FBox {
 
   void act() {
     println(checkContact("Player"));
-    if (checkContact("Grab") || checkContact("Player") || checkContact("Enemy")) {
+    if (checkContact("Grab") || checkContact("Player") || checkContact("enemy")) {
       if (doorrr == true) {
         doorrr = false;
         world.remove(door);
