@@ -3,21 +3,47 @@ import processing.net.*;
 import processing.sound.*;
 import controlP5.*;
 
-
+////////////////////// SETTINGS //////////////////////
 
 SoundFile music, coinSound;
 Sound sound;
-int psc = 0;
 
 ControlP5 cp5;
+Menu menu;
+
 Server s;
 Client c;
-String input;
-float data[];
-
-boolean isRunning, play = false;
 
 FWorld world;
+FBox player2;
+Enemy[] enemies = new Enemy[10];
+FBox[] coins = new FBox[500];
+FBox[] bricks = new FBox[500];
+FBox[] boxes = new FBox[10];
+PButton[] buttons = new PButton[10];
+PParticleEmitter[] brickParticleSystem = new PParticleEmitter[500];
+FPlayer player;
+
+String input;
+String[] lines = new String[4];
+String[] linesToSave = new String[4];
+String ip = "";
+String filePath = "";
+String settingsPath = System.getenv("APPDATA") + "/Puzhius/settings.txt";
+
+int psc = 0;
+int gridSize = 32;
+int cc = 0;
+int cs, score = 0;
+
+float data[];
+float zoom = 1.5;
+
+boolean isRunning, play = false;
+boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, dkey, qkey, ekey, spacekey;
+boolean fileLoaded = false;
+boolean sp = false;
+boolean waiting = true;
 
 color white = #FFFFFF;
 color black = #000000;
@@ -32,26 +58,8 @@ color brown = #996633;
 color sky = #17acd1;
 
 PImage dirt, ice, stone, tree, flower, bad, treeTrunk, energy, jump, sklon1, sklon2, coin, spike, trans, conc1, conc2, conc3, brick;
-int gridSize = 32;
-float zoom = 1.5;
-boolean upkey, downkey, leftkey, rightkey, wkey, akey, skey, dkey, qkey, ekey, spacekey;
-boolean fileLoaded = false;
-boolean sp = false;
-boolean waiting = true;
-String filePath = "";
-String settingsPath = System.getenv("APPDATA") + "/Puzhius/settings.txt";
-FPlayer player;
-FBox player2;
-Enemy[] enemies = new Enemy[10];
-FBox[] coins = new FBox[500];
-FBox[] bricks = new FBox[500];
-PParticleEmitter[] brickParticleSystem = new PParticleEmitter[500];
-int cc = 0;
-FBox[] boxes = new FBox[10];
-PButton[] buttons = new PButton[10];
-boolean otherGrab = false;
 
-Menu menu;
+////////////////////// TILED SETTINGS //////////////////////
 
 String dirtTile = "0";
 String grassTile = "1";
@@ -74,35 +82,39 @@ String SpikeTile = "16";
 String airTile = "-1";
 
 
-String[] lines = new String[4];
-String[] linesToSave = new String[4];
-
-int cs, score = 0;
-String ip = "";
-
+////////////////////// SETUP //////////////////////
 
 void setup() {
-  sound = new Sound(this);
-  coinSound = new SoundFile(this, "data/coin.mp3");
-  size(1000, 1000);
-  textSize(128);
+  //////////// INIT SOUND ////////////
+  
+  sound = new Sound(this); // Creating sound object
+  
+  coinSound = new SoundFile(this, "data/coin.mp3"); // Creating sound object
+  
+  music = new SoundFile(this, "data/music.mp3"); // Creating sound object
+  
+  //////////// INIT WINDOW ////////////
+  size(1000, 1000); 
+  textSize(128); 
 
-  surface.setFrameRate(60);
+  surface.setFrameRate(60); 
+
+  smooth(8); 
+
+  //////////// INIT GUI ////////////
+  
+  menu = new Menu(); 
+  cp5 = new ControlP5(this); 
+  menu.init(cp5); 
 
 
-  text("Loading...", height/2, width/2);
+  //////////// INIT ////////////
+  
+  Fisica.init(this);
+  
+  //////////// LOAD SETTINGS ////////////
 
-  smooth(8);
-
-  menu = new Menu();
-  cp5 = new ControlP5(this);
-
-  menu.init(cp5);
-
-
-
-
-  try {
+  try { // Try load settings
     lines = loadStrings(settingsPath);
 
     cs = int(lines[0]);
@@ -113,17 +125,14 @@ void setup() {
 
     menu.setVolume(float(lines[3]));
   }
-  catch(Exception e) {
+  catch(Exception e) { // If cannot load settings, create settings file
     saveConfig();
   }
 
-
-
-  menu.setIpAddress(ip);
-  menu.setMap(filePath);
-
-
-  Fisica.init(this);
+  menu.setIpAddress(ip); // Set ip address from settings file
+  menu.setMap(filePath); // Set map from settings file
+  
+  //////////// LOAD TEXTURES ////////////
 
   dirt = loadImage("data/dirt.png");
   stone = loadImage("data/grass.png");
@@ -145,12 +154,18 @@ void setup() {
   conc3 = loadImage("data/conc3.png");
 }
 
+////////////////////// LOAD TILED WORLD //////////////////////
+
 void loadWorld(String filePath) {
   int x = 0;
   int y = 0;
-
+  
+  //////////// LOAD FILE ////////////
+  
   String[] file = loadStrings(filePath);
   String[] idS = split(file[0], ",");
+  
+  //////////// GET FILE LENGTH ////////////
 
   for (int w = 0; w < idS.length; w++) {
     x++;
@@ -160,9 +175,10 @@ void loadWorld(String filePath) {
     y++;
   }
 
-
-
   println("X: " + str(x*gridSize) + ", Y: ", str(y*gridSize));
+  
+  //////////// LOAD WORLD ////////////
+  
   x = 0;
   y = 0;
   world = new FWorld(0, 0, 2000, 2000);
@@ -358,19 +374,25 @@ void loadWorld(String filePath) {
     }
   }
 
-
-  player2 = new FBox(gridSize, gridSize);
-  player2.setFillColor(blue);
-  world.add(player2);
-  player2.setName("Player");
+  //////////// LOAD OTHER OBJECT ////////////
+  if (!sp) {
+    player2 = new FBox(gridSize, gridSize);
+    player2.setFillColor(blue);
+    world.add(player2);
+    player2.setName("Player");
+  }
   loadPlayer();
   thread("playMusic");
   play = true;
 }
+
+////////////////////// LOAD PLAYER //////////////////////
 void loadPlayer() {
   player = new FPlayer();
   world.add(player);
 }
+
+////////////////////// CHECK INTERACTIONS FOR PLAYER 2 //////////////////////
 
 void checkCoinP2() {
   Object[] contacts = player2.getContacts().toArray();
@@ -412,7 +434,10 @@ void checkCoinP2() {
   }
 }
 
+////////////////////// LOOP CODE //////////////////////
+
 void draw() {
+  //////////// IF PLAYING ////////////
   if (play == true)
   {
     if (waiting) {
@@ -437,11 +462,15 @@ void draw() {
 
 
       background(pink);
+      drawWorld();
       textAlign(LEFT);
       text("Coins: " + score/2, 50, height/10);
-      drawWorld();
+      
+      
       player.act();
-      checkCoinP2();
+      
+      if (!sp) checkCoinP2();
+      
       for (PParticleEmitter ps : brickParticleSystem) {
         if (ps != null && ps.origin != null) {
           ps.run();
@@ -451,7 +480,7 @@ void draw() {
 
     if (!sp) {
       player2.setVelocity(0, 0);
-      if (cs == 2) {
+      if (cs == 2) { //////////// FOR SERVER ////////////
 
         // Data To Send Generation
         String dataToSend = "";
@@ -494,7 +523,7 @@ void draw() {
             }
           }
         }
-      } else { // For client
+      } else { //////////// FOR CLIENT ////////////
         c.write(player.getX() + " " + player.getY() + "\n"); // Send Position To Another Player
 
         if (c.available() > 0) {
@@ -527,6 +556,9 @@ void draw() {
         }
       }
     }
+    
+    //////////// IF NOT PLAYING ////////////
+    
   } else {
     menu.act();
     if (menu.getServerBtn()) {
@@ -545,6 +577,7 @@ void draw() {
   }
 }
 
+////////////////////// DRAW THE WORLD //////////////////////
 
 void drawWorld() {
   pushMatrix();
@@ -554,6 +587,8 @@ void drawWorld() {
   world.draw();
   popMatrix();
 }
+
+////////////////////// PLAY BUTTONS //////////////////////
 
 void play() {
   menu.destroy();
@@ -566,7 +601,6 @@ void play() {
       s = new Server(this, 5060);
     } else {
       c = new Client(this, ip, 5060);
-      c.write("join" + "\n");
       waiting = false;
     }
   } else {
@@ -579,6 +613,7 @@ void play() {
   loadWorld(filePath);
 }
 
+////////////////////// SAVE SETTINGS TO APPDATA //////////////////////
 
 void saveConfig() {
   linesToSave[0] = str(cs);
@@ -589,8 +624,9 @@ void saveConfig() {
   saveStrings(settingsPath, linesToSave);
 }
 
+////////////////////// PLAY MUSIC IN THREAD //////////////////////
+
 void playMusic() {
-  music = new SoundFile(this, "data/music.mp3");
   while (true) {
     delay(10000);
     if (!music.isPlaying() && waiting == false) {

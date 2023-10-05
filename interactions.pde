@@ -13,7 +13,6 @@ void keyPressed() {
 
 void keyTyped() {
   if(key == 'E' || key == 'e') ekey = true;
-  if(key == ESC) println("ESCAPE");
 }
 
 void keyReleased() {

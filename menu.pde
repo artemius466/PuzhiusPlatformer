@@ -256,7 +256,6 @@ void fileSelected(File selection) {
 boolean oldPress = false;
 
 public void Select() {
-  println("Puzhaa");
   if (oldPress == true) {
     selectInput("Select a file to process:", "fileSelected");
   } else {
