@@ -12,6 +12,9 @@ Puzhius platformer is also supports [tiled](https://www.mapeditor.org/) maps.
 
 To create them, you need to download [tiled package](https://github.com/artemius466/PuzhiusPlatformer/releases/tag/Other).
 
+## Uploading levels
+You may upload levels to [Puzhius Levels telegram bot](https://t.me/PuzhiusLevelsBot).
+
 ## Screenshots
 ![Logo](images/2.jpg)
 ![Logo](images/3.jpg)
