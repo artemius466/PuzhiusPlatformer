@@ -375,12 +375,10 @@ void loadWorld(String filePath) {
   }
 
   //////////// LOAD OTHER OBJECT ////////////
-  if (!sp) {
-    player2 = new FBox(gridSize, gridSize);
-    player2.setFillColor(blue);
-    world.add(player2);
-    player2.setName("Player");
-  }
+  player2 = new FBox(gridSize, gridSize);
+  player2.setFillColor(blue);
+  world.add(player2);
+  player2.setName("Player");
   loadPlayer();
   thread("playMusic");
   play = true;
